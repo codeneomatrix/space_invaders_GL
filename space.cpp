@@ -20,13 +20,13 @@ void keyboard(unsigned char key, int x, int y){
 void arrowkey(int key, int x, int y){
     switch (key) {
         case GLUT_KEY_RIGHT:
-            //if(tx < 0.25)
+            if(tx < 0.70)
                 tx += 0.05;
             printf("valor tx: %f\n", tx);
         break;
 
         case GLUT_KEY_LEFT:
-        //if(tx > 10)
+        if(tx > -0.70)
             tx -= 0.05;
             printf("valor tx: %f\n", tx);
         break;
@@ -44,16 +44,41 @@ void nave(){
     //glTranslatef(tx, ty, 0);
 
     glBegin(GL_POLYGON);
-        glVertex2f(-0.3 +tx, -0.8+ty);
-        glVertex2f(-0.3+tx, -0.9+ty);
-        glVertex2f(0.3+tx, -0.9+ty);
-        glVertex2f(0.3+tx, -0.8+ty);
+        glVertex2f(-0.3 +tx, -0.8);
+        glVertex2f(-0.3+tx, -0.9);
+        glVertex2f(0.3+tx, -0.9);
+        glVertex2f(0.3+tx, -0.8);
     glEnd();
 }//nave
+
+void enemigo(){
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_POLYGON);
+        glVertex2f(0.0, 0.9-ty);
+        glVertex2f(0.0, 1.0-ty);
+        glVertex2f(0.1, 1.0-ty);
+        glVertex2f(0.1, 0.9-ty);
+    glEnd();
+}//enemigo
+
+void moverenemigo(){
+    if(ty < 2.0){
+        ty+=0.05;
+    }
+    else{
+      ty=0.0;
+    }
+    //ty = 0.0;
+    printf("ty: %f\n", ty);
+    glFlush();
+}//moverenemigo
 
 void display(void){
     espacio();
     nave();
+    enemigo();
+    moverenemigo();
+
     glFlush();
 }//display
 
