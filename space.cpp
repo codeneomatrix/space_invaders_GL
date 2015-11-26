@@ -1,9 +1,13 @@
 #include <GL/glut.h>
+#include <stdio.h>
 /*TODO
 [ ] - dibujar el espacio (tablero)
 [ ] - dibujar la nave protagonista
 [ ] - mover la nave de izquierda a derecha
 */
+
+float tx = 0.0;
+float ty = 0.0;
 
 void keyboard(unsigned char key, int x, int y){
     switch (key) {
@@ -13,6 +17,23 @@ void keyboard(unsigned char key, int x, int y){
     }//switch
 }//keyboard
 
+void arrowkey(int key, int x, int y){
+    switch (key) {
+        case GLUT_KEY_RIGHT:
+            //if(tx < 0.25)
+                tx += 0.05;
+            printf("valor tx: %f\n", tx);
+        break;
+
+        case GLUT_KEY_LEFT:
+        //if(tx > 10)
+            tx -= 0.05;
+            printf("valor tx: %f\n", tx);
+        break;
+    }//switch
+	glutPostRedisplay();
+}//ArrowKey
+
 void espacio(){
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(0.0, 0.0, 0.0);
@@ -20,11 +41,13 @@ void espacio(){
 
 void nave(){
     glColor3f(1.0, 1.0, 1.0);
+    //glTranslatef(tx, ty, 0);
+
     glBegin(GL_POLYGON);
-        glVertex2f(-0.3, -0.8);
-        glVertex2f(-0.3, -0.9);
-        glVertex2f(0.3, -0.9);
-        glVertex2f(0.3, -0.8);
+        glVertex2f(-0.3 +tx, -0.8+ty);
+        glVertex2f(-0.3+tx, -0.9+ty);
+        glVertex2f(0.3+tx, -0.9+ty);
+        glVertex2f(0.3+tx, -0.8+ty);
     glEnd();
 }//nave
 
@@ -46,7 +69,7 @@ int main(int argc, char **argv){
 
   //glutReshapeFunc(reshape);
   glutKeyboardFunc(keyboard);
-  //glutSpecialFunc(arrowkey);
+  glutSpecialFunc(arrowkey);
 
   glutMainLoop();
   return 0;
