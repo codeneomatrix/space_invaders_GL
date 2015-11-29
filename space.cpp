@@ -11,6 +11,7 @@
 static char label[100];
 float tx = 0.0;
 float ty = 0.0;
+float pb = 0.0;
 
 void inline drawString (char *s)
 {
@@ -59,7 +60,23 @@ void nave(){
         glVertex2f(0.3+tx, -0.9);
         glVertex2f(0.3+tx, -0.8);
     glEnd();
+    glBegin(GL_POLYGON);
+        glVertex2f(-0.1 +tx, -0.7);
+        glVertex2f(-0.1+tx, -0.8);
+        glVertex2f(0.1+tx, -0.8);
+        glVertex2f(0.1+tx, -0.7);
+    glEnd();
 }//nave
+
+void bala(){
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_POLYGON);
+        glVertex2f(-0.03, -0.7+pb);
+        glVertex2f(-0.03, -0.77+pb);
+        glVertex2f(0.03, -0.77+pb);
+        glVertex2f(0.03, -0.7+pb);
+    glEnd();
+}//bala
 
 void enemigo(){
     glColor3f(0.0, 1.0, 0.0);
@@ -83,6 +100,18 @@ void moverenemigo(){
     //glFlush();
 }//moverenemigo
 
+void moverbala(){
+    if(pb < 2.0){
+        pb+=0.05;
+    }
+    else{
+      pb=0.0;
+    }
+    //pb = 0.0;
+    printf("pb: %f\n", pb);
+    //glFlush();
+}//moverenemigo
+
 void texto(){
  glColor3f(0.0, 1.0, 0.0);
  sprintf(label,"%s", "space Invaders 2");
@@ -96,10 +125,20 @@ void display(void){
     espacio();
     nave();
     enemigo();
+    bala();
     texto();
+
     glFlush();
    
 }//display
+
+void movbala(int v)
+{
+    glutTimerFunc(500,movbala,2);
+    moverbala();
+    bala();
+    glutPostRedisplay();
+}
 
 void idle(int v)
 {
