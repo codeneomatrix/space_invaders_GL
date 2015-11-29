@@ -1,9 +1,10 @@
 #include <GL/glut.h>
 #include <stdio.h>
 /*TODO
-[ ] - dibujar el espacio (tablero)
-[ ] - dibujar la nave protagonista
-[ ] - mover la nave de izquierda a derecha
+[*] - dibujar el espacio (tablero)
+[*] - dibujar la nave protagonista
+[*] - mover la nave de izquierda a derecha
+[*] - mover automaticamente los enemigos
 */
 
 float tx = 0.0;
@@ -70,17 +71,24 @@ void moverenemigo(){
     }
     //ty = 0.0;
     printf("ty: %f\n", ty);
-    glFlush();
+    //glFlush();
 }//moverenemigo
 
 void display(void){
     espacio();
     nave();
     enemigo();
-    moverenemigo();
-
     glFlush();
 }//display
+
+void idle(int v)
+{
+
+    glutTimerFunc(500,idle,1);
+    moverenemigo();
+    enemigo();
+    glutPostRedisplay();
+}
 
 int main(int argc, char **argv){
   glutInit(&argc, argv); //es la que echa andar openGL
@@ -91,6 +99,9 @@ int main(int argc, char **argv){
   glutCreateWindow("Space Invaders GL"); //lanza la ventana
   //Llamada a la función de dibujado
   glutDisplayFunc(display); //OpenGL se refresca solito
+  glutTimerFunc(500,idle,0); // idle es una funcion que se ejecuta cuando no hay otra cosa que hacer
+  //Timer ejecuta a idle cada cierto tiempo en este caso 500 milisegundos
+  //el 0 como parametro es un id de este proceso retardado
 
   //glutReshapeFunc(reshape);
   glutKeyboardFunc(keyboard);
