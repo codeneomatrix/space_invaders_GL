@@ -1,4 +1,6 @@
 #include <GL/glut.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 /*TODO
 [*] - dibujar el espacio (tablero)
@@ -6,9 +8,16 @@
 [*] - mover la nave de izquierda a derecha
 [*] - mover automaticamente los enemigos
 */
-
+static char label[100];
 float tx = 0.0;
 float ty = 0.0;
+
+void inline drawString (char *s)
+{
+ unsigned int i;
+ for (i=0; i<strlen(s); i++)
+	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]); //TIPO YA TAMAÑO DE LETRA
+}
 
 void keyboard(unsigned char key, int x, int y){
     switch (key) {
@@ -74,11 +83,22 @@ void moverenemigo(){
     //glFlush();
 }//moverenemigo
 
+void texto(){
+ glColor3f(0.0, 1.0, 0.0);
+ sprintf(label,"%s", "space Invaders 2");
+ glRasterPos2f(-0.15, 0); //posision donde aparecera el texto
+ drawString (label);
+}
+
 void display(void){
+	//char nombre="space Invaders 2";
+
     espacio();
     nave();
     enemigo();
+    texto();
     glFlush();
+   
 }//display
 
 void idle(int v)
