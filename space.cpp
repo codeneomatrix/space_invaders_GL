@@ -1,13 +1,61 @@
 #include <GL/glut.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
+#include "entidades.cpp"
+//#include "mis_funciones.cpp"
 /*TODO
-[ ] - dibujar el espacio (tablero)
-[ ] - dibujar la nave protagonista
-[ ] - mover la nave de izquierda a derecha
+[*] - dibujar el espacio (tablero)
+[*] - dibujar la nave protagonista
+[*] - mover la nave de izquierda a derecha
+[*] - mover automaticamente los enemigos
 */
-
+static char label[100];
 float tx = 0.0;
 float ty = 0.0;
+float pb = 0.0;
+
+void init(){
+	/*world.mi_nave.x = 220;
+	world.mi_nave.y = 5;
+	world.mi_nave.anchura = 30;
+	world.mi_nave.altura = 45;
+	world.mi_nave.vidas = 5;
+
+	Nave_enemiga nave1_1;
+		nave1_1.xinc = 50;
+		nave1_1.x = 50;
+		nave1_1.y = 250;
+		nave1_1.anchura = 30;
+		nave1_1.altura = 30;
+		nave1_1.vidas = 1;
+		nave1_1.existe = true;
+
+	Nave_enemiga nave1_2;
+		nave1_2.xinc = 115;
+		nave1_2.x = 115;
+		nave1_2.y = 250;
+		nave1_2.anchura = 30;
+		nave1_2.altura = 30;
+		nave1_2.vidas = 1;
+		nave1_2.existe = true;*/
+
+	//las naves enemigas las cargamos a un vector de naves enemigas que se encuentra en 
+	//entidades.cpp   
+
+	//world.naves1.push_back(nave1_1);
+
+		//usamos las estructuras del archivo entidades.h para 
+		//usarlas como si fueran objetos, instanciar n numero de objetos 
+		//y modificar sus propiedades de forma independiente
+}
+
+void inline drawString (char *s)
+{
+ unsigned int i;
+ for (i=0; i<strlen(s); i++)
+	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]); //TIPO YA TAMAÑO DE LETRA
+}
 
 void keyboard(unsigned char key, int x, int y){
     switch (key) {
@@ -20,6 +68,7 @@ void keyboard(unsigned char key, int x, int y){
 void arrowkey(int key, int x, int y){
     switch (key) {
         case GLUT_KEY_RIGHT:
+            //system("canberra-gtk-play -f audio.ogg"); canberra-gtk-play --id blaster.wav
             if(tx < 0.70)
                 tx += 0.05;
             printf("valor tx: %f\n", tx);
@@ -49,7 +98,23 @@ void nave(){
         glVertex2f(0.3+tx, -0.9);
         glVertex2f(0.3+tx, -0.8);
     glEnd();
+    glBegin(GL_POLYGON);
+        glVertex2f(-0.1 +tx, -0.7);
+        glVertex2f(-0.1+tx, -0.8);
+        glVertex2f(0.1+tx, -0.8);
+        glVertex2f(0.1+tx, -0.7);
+    glEnd();
 }//nave
+
+void bala(){
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_POLYGON);
+        glVertex2f(-0.03, -0.7+pb);
+        glVertex2f(-0.03, -0.77+pb);
+        glVertex2f(0.03, -0.77+pb);
+        glVertex2f(0.03, -0.7+pb);
+    glEnd();
+}//bala
 
 void enemigo(){
     glColor3f(0.0, 1.0, 0.0);
@@ -70,17 +135,57 @@ void moverenemigo(){
     }
     //ty = 0.0;
     printf("ty: %f\n", ty);
-    glFlush();
+    //glFlush();
 }//moverenemigo
 
+void moverbala(){
+    if(pb < 2.0){
+        pb+=0.05;
+    }
+    else{
+      pb=0.0;
+    }
+    //pb = 0.0;
+    printf("pb: %f\n", pb);
+    //glFlush();
+}//moverenemigo
+
+void texto(){
+ glColor3f(0.0, 1.0, 0.0);
+ sprintf(label,"%s", "space Invaders 2");
+ glRasterPos2f(-0.15, 0); //posision donde aparecera el texto
+ drawString (label);
+}
+
 void display(void){
+	//char nombre="space Invaders 2";
+
     espacio();
     nave();
     enemigo();
-    moverenemigo();
+    bala();
+    texto();
 
     glFlush();
+   
 }//display
+
+void movbala(int v)
+{
+    glutTimerFunc(500,movbala,2);
+    moverbala();
+    bala();
+    glutPostRedisplay();
+}
+
+void idle(int v)
+{
+
+    glutTimerFunc(500,idle,1);
+    moverenemigo();
+    enemigo();
+    glutPostRedisplay();
+}
 
 int main(int argc, char **argv){
   glutInit(&argc, argv); //es la que echa andar openGL
@@ -91,6 +196,9 @@ int main(int argc, char **argv){
   glutCreateWindow("Space Invaders GL"); //lanza la ventana
   //Llamada a la función de dibujado
   glutDisplayFunc(display); //OpenGL se refresca solito
+  glutTimerFunc(500,idle,0); // idle es una funcion que se ejecuta cuando no hay otra cosa que hacer
+  //Timer ejecuta a idle cada cierto tiempo en este caso 500 milisegundos
+  //el 0 como parametro es un id de este proceso retardado
 
   //glutReshapeFunc(reshape);
   glutKeyboardFunc(keyboard);
