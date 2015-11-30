@@ -14,41 +14,44 @@ static char label[100];
 float tx = 0.0;
 float ty = 0.0;
 float pb = 0.0;
+int cantidadEnemigos = 7;
+World w1;
 
-void init(){
+void init(World world){
 	/*world.mi_nave.x = 220;
 	world.mi_nave.y = 5;
 	world.mi_nave.anchura = 30;
 	world.mi_nave.altura = 45;
 	world.mi_nave.vidas = 5;
+    */
+	Nave_enemiga nave1;
+		nave1.xinc = 50;
+		nave1.x = 0.2;
+		nave1.y = 0;
+		nave1.anchura = 30;
+		nave1.altura = 30;
+		nave1.vidas = 1;
+		nave1.existe = true;
 
-	Nave_enemiga nave1_1;
-		nave1_1.xinc = 50;
-		nave1_1.x = 50;
-		nave1_1.y = 250;
-		nave1_1.anchura = 30;
-		nave1_1.altura = 30;
-		nave1_1.vidas = 1;
-		nave1_1.existe = true;
+	Nave_enemiga nave2;
+		nave2.xinc = 115;
+		nave2.x = 0.7;
+		nave2.y = 0;
+		nave2.anchura = 30;
+		nave2.altura = 30;
+		nave2.vidas = 1;
+		nave2.existe = true;
 
-	Nave_enemiga nave1_2;
-		nave1_2.xinc = 115;
-		nave1_2.x = 115;
-		nave1_2.y = 250;
-		nave1_2.anchura = 30;
-		nave1_2.altura = 30;
-		nave1_2.vidas = 1;
-		nave1_2.existe = true;*/
+	//las naves enemigas las cargamos a un vector de naves enemigas que se encuentra en
+	//entidades.cpp
 
-	//las naves enemigas las cargamos a un vector de naves enemigas que se encuentra en 
-	//entidades.cpp   
-
-	//world.naves1.push_back(nave1_1);
-
-		//usamos las estructuras del archivo entidades.h para 
-		//usarlas como si fueran objetos, instanciar n numero de objetos 
+	world.naves_enemigas[0] = nave1;
+	world.naves_enemigas[1] = nave2;
+    printf("llego hasta aqui\n");
+		//usamos las estructuras del archivo entidades.h para
+		//usarlas como si fueran objetos, instanciar n numero de objetos
 		//y modificar sus propiedades de forma independiente
-}
+}//init
 
 void inline drawString (char *s)
 {
@@ -126,6 +129,21 @@ void enemigo(){
     glEnd();
 }//enemigo
 
+void dibujar_enemigos(World world){
+    float x, y;
+    glColor3f(0.0, 1.0, 0.0);
+    for(int i = 0; i < cantidadEnemigos; i++){
+        x = world.naves_enemigas[i].x;
+        y = world.naves_enemigas[i].y;
+    glBegin(GL_POLYGON);
+        glVertex2f(x, y);
+        glVertex2f(x, y+0.1);
+        glVertex2f(x+0.1, y+0.1);
+        glVertex2f(x+0.1, y);
+    glEnd();
+    printf("x: %f y: %f\n", x, y);
+    }//for
+}
 void moverenemigo(){
     if(ty < 2.0){
         ty+=0.05;
@@ -137,6 +155,17 @@ void moverenemigo(){
     printf("ty: %f\n", ty);
     //glFlush();
 }//moverenemigo
+
+void Mover_Naves_Enemigas(World& world) {
+	//MOVIMIENTO DE LAS NAVES ENEMIGAS
+	for (int i = 0; i < cantidadEnemigos; i++) {
+        if(world.naves_enemigas[i].y < 2.0){
+            world.naves_enemigas[i].y += 0.05;
+        }else{
+            world.naves_enemigas[i].y = 0.0;
+        }
+	}
+}//Mover_Naves_Enemigas
 
 void moverbala(){
     if(pb < 2.0){
@@ -165,9 +194,9 @@ void display(void){
     enemigo();
     bala();
     texto();
-
+    dibujar_enemigos(w1);
     glFlush();
-   
+
 }//display
 
 void movbala(int v)
@@ -199,7 +228,8 @@ int main(int argc, char **argv){
   glutTimerFunc(500,idle,0); // idle es una funcion que se ejecuta cuando no hay otra cosa que hacer
   //Timer ejecuta a idle cada cierto tiempo en este caso 500 milisegundos
   //el 0 como parametro es un id de este proceso retardado
-
+  //declarar una variable de tipo World y pasarsela a init como parámetro
+  init(w1);
   //glutReshapeFunc(reshape);
   glutKeyboardFunc(keyboard);
   glutSpecialFunc(arrowkey);

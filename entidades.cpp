@@ -71,11 +71,11 @@ struct World
 {
 	Box infoBox;
 	Box gameBox;
-	
+
 	//vector <int> coord;
 
-	int tiempoHoras;	
-	int tiempoMinutos;	
+	int tiempoHoras;
+	int tiempoMinutos;
 	int tiempoSegundos;
 	int tiempoMilisegundos;
 
@@ -83,7 +83,7 @@ struct World
 	char fpsString[100];
 
 	Nave mi_nave;
-//	vector <Disparo> disparos; 
+//	vector <Disparo> disparos;
 
 	bool hay_disparo;
 	int diferencial;
@@ -91,6 +91,7 @@ struct World
 	//vector <Nave_enemiga> naves1;
 	//vector <Nave_enemiga> naves2;
 	//vector <Nave_enemiga> naves3;
+	Nave_enemiga naves_enemigas [7];
 	int numero_enemigos1;
 	int numero_enemigos2;
 	int numero_enemigos3;
