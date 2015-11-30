@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "entidades.cpp"
+//#include "mis_funciones.cpp"
 /*TODO
 [*] - dibujar el espacio (tablero)
 [*] - dibujar la nave protagonista
@@ -12,6 +14,41 @@ static char label[100];
 float tx = 0.0;
 float ty = 0.0;
 float pb = 0.0;
+
+void init(){
+	/*world.mi_nave.x = 220;
+	world.mi_nave.y = 5;
+	world.mi_nave.anchura = 30;
+	world.mi_nave.altura = 45;
+	world.mi_nave.vidas = 5;
+
+	Nave_enemiga nave1_1;
+		nave1_1.xinc = 50;
+		nave1_1.x = 50;
+		nave1_1.y = 250;
+		nave1_1.anchura = 30;
+		nave1_1.altura = 30;
+		nave1_1.vidas = 1;
+		nave1_1.existe = true;
+
+	Nave_enemiga nave1_2;
+		nave1_2.xinc = 115;
+		nave1_2.x = 115;
+		nave1_2.y = 250;
+		nave1_2.anchura = 30;
+		nave1_2.altura = 30;
+		nave1_2.vidas = 1;
+		nave1_2.existe = true;*/
+
+	//las naves enemigas las cargamos a un vector de naves enemigas que se encuentra en 
+	//entidades.cpp   
+
+	//world.naves1.push_back(nave1_1);
+
+		//usamos las estructuras del archivo entidades.h para 
+		//usarlas como si fueran objetos, instanciar n numero de objetos 
+		//y modificar sus propiedades de forma independiente
+}
 
 void inline drawString (char *s)
 {
