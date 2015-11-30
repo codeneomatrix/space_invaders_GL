@@ -31,6 +31,7 @@ void keyboard(unsigned char key, int x, int y){
 void arrowkey(int key, int x, int y){
     switch (key) {
         case GLUT_KEY_RIGHT:
+            //system("canberra-gtk-play -f audio.ogg"); canberra-gtk-play --id blaster.wav
             if(tx < 0.70)
                 tx += 0.05;
             printf("valor tx: %f\n", tx);
