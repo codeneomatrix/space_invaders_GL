@@ -219,10 +219,10 @@ void moverenemigo(){
 World Mover_Naves_Enemigas(World world) {
 	//MOVIMIENTO DE LAS NAVES ENEMIGAS
 	for (int i = 0; i < cantidadEnemigos; i++) {
-        if(world.naves_enemigas[i].y < 2.0){
+        if(world.naves_enemigas[i].y > -1.0){
             world.naves_enemigas[i].y -= 0.05;
         }else{
-            world.naves_enemigas[i].y = 0.0;
+            world.naves_enemigas[i].y = 0.7;
         }
 	}
 	return world;
