@@ -27,8 +27,8 @@ struct Nave
 struct Nave_enemiga
 {
 	int xinc;
-	int x;
-	int y;
+	float x;
+	float y;
 	int anchura;
 	int altura;
 	int vidas;
