@@ -221,9 +221,24 @@ World Mover_Naves_Enemigas(World world) {
 	for (int i = 0; i < cantidadEnemigos; i++) {
         if(world.naves_enemigas[i].y > -1.0){
             world.naves_enemigas[i].y -= 0.05;
-        }else{
+		}else{
             world.naves_enemigas[i].y = 0.7;
         }
+		if (world.dcha == true) {
+			world.naves_enemigas[i].x += 0.05;
+			if (world.naves_enemigas[7].x >= 0.8) {
+				world.dcha = false;
+				world.izda = true;
+			}
+		}
+		if (world.izda == true) {
+			world.naves_enemigas[i].x -= 0.05;
+			if (world.naves_enemigas[0].x <= -0.3) {
+				world.dcha = true;
+				world.izda = false;
+			}
+		}
+		printf("naves 0.x %f\n", world.naves_enemigas[0].x);
 	}
 	return world;
 }//Mover_Naves_Enemigas
