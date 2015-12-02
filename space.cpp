@@ -10,14 +10,18 @@
 [*] - dibujar la nave protagonista
 [*] - mover la nave de izquierda a derecha
 [*] - mover automaticamente los enemigos
+[ ] - modificar las variables vida y puntuacion
 */
 static char label[100];
+static char score[100];
+static char vidas[100];
 float tx = 0.0;
 float ty = 0.0;
 float pb = 0.0;
 int cantidadEnemigos = 8;
 World w1;
-
+int puntuacion = 0;
+int vida = 3;
 
 World init(World world){
 	/*world.mi_nave.x = 220;
@@ -263,8 +267,14 @@ void moverbala(){
 void texto(){
  glColor3f(0.0, 1.0, 0.0);
  sprintf(label,"%s", "space Invaders 2");
- glRasterPos2f(-0.15, 0); //posision donde aparecera el texto
+ sprintf(score,"%s %d", "Score:", puntuacion);
+ sprintf(vidas, "%s %d", "Vidas:", vida);
+ glRasterPos2f(-0.95, 0.95); //posision donde aparecera el texto
  drawString (label);
+ glRasterPos2f(-0.95, 0.90); //posision donde aparecera el texto
+ drawString (score);
+ glRasterPos2f(-0.95, 0.85); //posision donde aparecera el texto
+ drawString (vidas);
 }
 
 void display(void){
