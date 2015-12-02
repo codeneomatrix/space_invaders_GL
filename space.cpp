@@ -11,6 +11,7 @@
 [*] - mover la nave de izquierda a derecha
 [*] - mover automaticamente los enemigos
 [ ] - modificar las variables vida y puntuacion
+[ ] - refactorizar el random que hace descender a los enemigos 
 */
 static char label[100];
 static char score[100];
@@ -160,16 +161,16 @@ void nave(){
     //glTranslatef(tx, ty, 0);
 
     glBegin(GL_POLYGON);
-        glVertex2f(-0.3 +tx, -0.8);
-        glVertex2f(-0.3+tx, -0.9);
-        glVertex2f(0.3+tx, -0.9);
-        glVertex2f(0.3+tx, -0.8);
+        glVertex2f(-0.15 +tx, -0.8);
+        glVertex2f(-0.15+tx, -0.85);
+        glVertex2f(0.15+tx, -0.85);
+        glVertex2f(0.15+tx, -0.8);
     glEnd();
     glBegin(GL_POLYGON);
-        glVertex2f(-0.1 +tx, -0.7);
-        glVertex2f(-0.1+tx, -0.8);
-        glVertex2f(0.1+tx, -0.8);
-        glVertex2f(0.1+tx, -0.7);
+        glVertex2f(-0.05 +tx, -0.8);
+        glVertex2f(-0.05+tx, -0.75);
+        glVertex2f(0.05+tx, -0.75);
+        glVertex2f(0.05+tx, -0.8);
     glEnd();
 }//nave
 
