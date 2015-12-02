@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "entidades.cpp"
+#include <math.h>
 //#include "mis_funciones.cpp"
 /*TODO
 [*] - dibujar el espacio (tablero)
@@ -16,6 +17,7 @@ float ty = 0.0;
 float pb = 0.0;
 int cantidadEnemigos = 8;
 World w1;
+
 
 World init(World world){
 	/*world.mi_nave.x = 220;
@@ -102,9 +104,9 @@ World init(World world){
 	world.naves_enemigas[5] = nave6;
 	world.naves_enemigas[6] = nave7;
 	world.naves_enemigas[7] = nave8;
-    printf("llego hasta aqui\n");
-	printf("nave enemiga 0 es: %f\n", world.naves_enemigas[0].x);
-	printf("nave enemiga 1 es: %f\n", nave1.x);
+    //printf("llego hasta aqui\n");
+	//printf("nave enemiga 0 es: %f\n", world.naves_enemigas[0].x);
+	//printf("nave enemiga 1 es: %f\n", nave1.x);
 		//usamos las estructuras del archivo entidades.h para
 		//usarlas como si fueran objetos, instanciar n numero de objetos
 		//y modificar sus propiedades de forma independiente
@@ -132,13 +134,13 @@ void arrowkey(int key, int x, int y){
             //system("canberra-gtk-play -f audio.ogg"); canberra-gtk-play --id blaster.wav
             if(tx < 0.70)
                 tx += 0.05;
-            printf("valor tx: %f\n", tx);
+            //printf("valor tx: %f\n", tx);
         break;
 
         case GLUT_KEY_LEFT:
         if(tx > -0.70)
             tx -= 0.05;
-            printf("valor tx: %f\n", tx);
+            //printf("valor tx: %f\n", tx);
         break;
     }//switch
 	glutPostRedisplay();
@@ -193,7 +195,7 @@ void dibujar_enemigos(World world){
     for(int i = 0; i < cantidadEnemigos; i++){
         x = world.naves_enemigas[i].x;
         y = world.naves_enemigas[i].y;
-    	printf("x: %f y: %f\n", x, y);
+    	//printf("x: %f y: %f\n", x, y);
     glBegin(GL_POLYGON);
         glVertex2f(x, y);
     	//printf("x: %f y: %f\n", x, y);
@@ -212,7 +214,7 @@ void moverenemigo(){
       ty=0.0;
     }
     //ty = 0.0;
-    printf("ty: %f\n", ty);
+    //printf("ty: %f\n", ty);
     //glFlush();
 }//moverenemigo
 
@@ -220,25 +222,28 @@ World Mover_Naves_Enemigas(World world) {
 	//MOVIMIENTO DE LAS NAVES ENEMIGAS
 	for (int i = 0; i < cantidadEnemigos; i++) {
         if(world.naves_enemigas[i].y > -1.0){
-            world.naves_enemigas[i].y -= 0.05;
+			float var = rand();
+			var = var/10000000000;
+            world.naves_enemigas[i].y -= var;
+			printf("random: %f\n", var);
 		}else{
             world.naves_enemigas[i].y = 0.7;
         }
 		if (world.dcha == true) {
 			world.naves_enemigas[i].x += 0.05;
-			if (world.naves_enemigas[7].x >= 0.8) {
+			if (world.naves_enemigas[i].x >= 0.8) {
 				world.dcha = false;
 				world.izda = true;
 			}
 		}
 		if (world.izda == true) {
 			world.naves_enemigas[i].x -= 0.05;
-			if (world.naves_enemigas[0].x <= -0.3) {
+			if (world.naves_enemigas[i].x <= -0.3) {
 				world.dcha = true;
 				world.izda = false;
 			}
 		}
-		printf("naves 0.x %f\n", world.naves_enemigas[0].x);
+		//printf("naves 0.x %f\n", world.naves_enemigas[0].x);
 	}
 	return world;
 }//Mover_Naves_Enemigas
@@ -251,7 +256,7 @@ void moverbala(){
       pb=0.0;
     }
     //pb = 0.0;
-    printf("pb: %f\n", pb);
+    //printf("pb: %f\n", pb);
     //glFlush();
 }//moverenemigo
 
@@ -286,7 +291,7 @@ void movbala(int v)
 void idle(int v)
 {
 
-    glutTimerFunc(500,idle,1);
+    glutTimerFunc(600,idle,1);
 	w1 = Mover_Naves_Enemigas(w1);
 	dibujar_enemigos(w1);
 	//moverenemigo();
