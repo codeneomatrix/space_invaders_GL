@@ -84,6 +84,7 @@ struct World
 
 	Nave mi_nave;
 //	vector <Disparo> disparos;
+	Disparo disparos[40];
 
 	bool hay_disparo;
 	int diferencial;

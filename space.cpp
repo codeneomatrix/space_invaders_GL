@@ -11,7 +11,7 @@
 [*] - mover la nave de izquierda a derecha
 [*] - mover automaticamente los enemigos
 [ ] - modificar las variables vida y puntuacion
-[ ] - refactorizar el random que hace descender a los enemigos 
+[ ] - refactorizar el random que hace descender a los enemigos
 */
 static char label[100];
 static char score[100];
@@ -23,14 +23,10 @@ int cantidadEnemigos = 8;
 World w1;
 int puntuacion = 0;
 int vida = 3;
+int disparo_actual = 0;
 
 World init(World world){
-	/*world.mi_nave.x = 220;
-	world.mi_nave.y = 5;
-	world.mi_nave.anchura = 30;
-	world.mi_nave.altura = 45;
-	world.mi_nave.vidas = 5;
-    */
+
 	Nave_enemiga nave1;
 		nave1.xinc = 50;
 		nave1.x = -0.2;
@@ -115,6 +111,14 @@ World init(World world){
 		//usamos las estructuras del archivo entidades.h para
 		//usarlas como si fueran objetos, instanciar n numero de objetos
 		//y modificar sus propiedades de forma independiente
+	Disparo d1;
+	d1.x = 0;
+	d1.y = 0;
+	d1.existe = false;
+
+	for(int i = 0; i < 40; i++){
+		world.disparos[i] = d1;
+	}//for
 	return world;
 }//init
 
@@ -130,6 +134,9 @@ void keyboard(unsigned char key, int x, int y){
         case 27:
             exit(0);
             break;
+		case 32:
+			puts("este es un espacio");
+			break;
     }//switch
 }//keyboard
 
@@ -174,15 +181,7 @@ void nave(){
     glEnd();
 }//nave
 
-void bala(){
-    glColor3f(1.0, 1.0, 1.0);
-    glBegin(GL_POLYGON);
-        glVertex2f(-0.03, -0.7+pb);
-        glVertex2f(-0.03, -0.77+pb);
-        glVertex2f(0.03, -0.77+pb);
-        glVertex2f(0.03, -0.7+pb);
-    glEnd();
-}//bala
+
 
 void enemigo(){
     glColor3f(0.0, 1.0, 0.0);
@@ -211,26 +210,16 @@ void dibujar_enemigos(World world){
     glEnd();
     }//for
 }//dibujar_enemigos
-void moverenemigo(){
-    if(ty < 2.0){
-        ty+=0.05;
-    }
-    else{
-      ty=0.0;
-    }
-    //ty = 0.0;
-    //printf("ty: %f\n", ty);
-    //glFlush();
-}//moverenemigo
+
 
 World Mover_Naves_Enemigas(World world) {
 	//MOVIMIENTO DE LAS NAVES ENEMIGAS
 	for (int i = 0; i < cantidadEnemigos; i++) {
         if(world.naves_enemigas[i].y > -1.0){
-			float var = rand();
-			var = var/10000000000;
+			float var = rand() % 10;
+			var = var / 100;
             world.naves_enemigas[i].y -= var;
-			printf("random: %f\n", var);
+			//printf("random: %f\n", var);
 		}else{
             world.naves_enemigas[i].y = 0.7;
         }
@@ -264,6 +253,58 @@ void moverbala(){
     //printf("pb: %f\n", pb);
     //glFlush();
 }//moverenemigo
+
+void dibujar_balas(World world){
+    float x, y;
+    glColor3f(0.0, 1.0, 0.0);
+    for(int i = 0; i < 40; i++){
+		if(world.disparos[i].existe == true){
+        	x = world.disparos[i].x;
+        	y = world.disparos[i].y;
+    		//printf("x: %f y: %f\n", x, y);
+    		glColor3f(1.0, 1.0, 1.0);
+			glBegin(GL_POLYGON);
+        		glVertex2f(x, y);
+    			//printf("x: %f y: %f\n", x, y);
+        		glVertex2f(x, y+0.07);
+    			//printf("x: %f y: %f\n", x, y+0.1);
+        		glVertex2f(x+0.06, y+0.07);
+        		glVertex2f(x+0.06, y);
+    		glEnd();
+		}//if
+    }//for
+}//dibujar_enemigos
+
+void bala(){
+    glBegin(GL_POLYGON);
+        glVertex2f(-0.03, -0.7+pb);
+        glVertex2f(-0.03, -0.77+pb);
+        glVertex2f(0.03, -0.77+pb);
+        glVertex2f(0.03, -0.7+pb);
+    glEnd();
+}//bala
+
+World mover_Balas(World world) {
+	for (int i = 0; i < 40; i++) {
+		if(world.disparos[i].existe == true){
+        	if(world.disparos[i].y > -1.0){
+            	world.disparos[i].y += 0.03;
+				//printf("random: %f\n", );
+			}else{
+            	world.disparos[i].existe = false;
+        	}
+		}//if
+	}//for
+	return world;
+}//Mover_Naves_Enemigas
+
+World habilitar_balas(World world){
+	if(disparo_actual == 40)
+		disparo_actual = 0; //resetear, por indice 0
+	if(world.disparos[disparo_actual].existe == false){
+		
+	}
+}//habilitar_balas
 
 void texto(){
  glColor3f(0.0, 1.0, 0.0);
@@ -301,7 +342,6 @@ void movbala(int v)
 
 void idle(int v)
 {
-
     glutTimerFunc(600,idle,1);
 	w1 = Mover_Naves_Enemigas(w1);
 	dibujar_enemigos(w1);
