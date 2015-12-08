@@ -37,8 +37,8 @@ struct Nave_enemiga
 
 struct Disparo
 {
-	int x;
-	int y;
+	float x;
+	float y;
 	int anchura;
 	int altura;
 	bool existe;

@@ -122,23 +122,13 @@ World init(World world){
 	return world;
 }//init
 
-void inline drawString (char *s)
-{
+void inline drawString (char *s){
  unsigned int i;
  for (i=0; i<strlen(s); i++)
 	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]); //TIPO YA TAMAÑO DE LETRA
 }
 
-void keyboard(unsigned char key, int x, int y){
-    switch (key) {
-        case 27:
-            exit(0);
-            break;
-		case 32:
-			puts("este es un espacio");
-			break;
-    }//switch
-}//keyboard
+
 
 void arrowkey(int key, int x, int y){
     switch (key) {
@@ -181,8 +171,6 @@ void nave(){
     glEnd();
 }//nave
 
-
-
 void enemigo(){
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_POLYGON);
@@ -210,7 +198,6 @@ void dibujar_enemigos(World world){
     glEnd();
     }//for
 }//dibujar_enemigos
-
 
 World Mover_Naves_Enemigas(World world) {
 	//MOVIMIENTO DE LAS NAVES ENEMIGAS
@@ -255,14 +242,16 @@ void moverbala(){
 }//moverenemigo
 
 void dibujar_balas(World world){
+	//puts("dibujar_balas");
     float x, y;
-    glColor3f(0.0, 1.0, 0.0);
+    //glColor3f(0.0, 1.0, 0.0);
     for(int i = 0; i < 40; i++){
 		if(world.disparos[i].existe == true){
         	x = world.disparos[i].x;
         	y = world.disparos[i].y;
-    		//printf("x: %f y: %f\n", x, y);
-    		glColor3f(1.0, 1.0, 1.0);
+    		printf("dibujando i: %d\n", i);
+
+    		glColor3f(0.0, 0.0, 1.0);
 			glBegin(GL_POLYGON);
         		glVertex2f(x, y);
     			//printf("x: %f y: %f\n", x, y);
@@ -284,7 +273,7 @@ void bala(){
     glEnd();
 }//bala
 
-World mover_Balas(World world) {
+World mover_balas(World world) {
 	for (int i = 0; i < 40; i++) {
 		if(world.disparos[i].existe == true){
         	if(world.disparos[i].y > -1.0){
@@ -299,56 +288,76 @@ World mover_Balas(World world) {
 }//Mover_Naves_Enemigas
 
 World habilitar_balas(World world){
+	//puts("habilitar_balas");
 	if(disparo_actual == 40)
 		disparo_actual = 0; //resetear, por indice 0
 	if(world.disparos[disparo_actual].existe == false){
-		
+		world.disparos[disparo_actual].x = 0.05+tx;
+		world.disparos[disparo_actual].y = -0.75;
+		world.disparos[disparo_actual].existe = true;
+		disparo_actual++;
+		printf("habilitar_balas x: %f\n", world.disparos[disparo_actual-1].x);
 	}
+	return world;
 }//habilitar_balas
 
 void texto(){
- glColor3f(0.0, 1.0, 0.0);
- sprintf(label,"%s", "space Invaders 2");
- sprintf(score,"%s %d", "Score:", puntuacion);
- sprintf(vidas, "%s %d", "Vidas:", vida);
- glRasterPos2f(-0.95, 0.95); //posision donde aparecera el texto
- drawString (label);
- glRasterPos2f(-0.95, 0.90); //posision donde aparecera el texto
- drawString (score);
- glRasterPos2f(-0.95, 0.85); //posision donde aparecera el texto
- drawString (vidas);
+	glColor3f(0.0, 1.0, 0.0);
+	sprintf(label,"%s", "space Invaders 2");
+	sprintf(score,"%s %d", "Score:", puntuacion);
+	sprintf(vidas, "%s %d", "Vidas:", vida);
+	glRasterPos2f(-0.95, 0.95); //posision donde aparecera el texto
+	drawString (label);
+	glRasterPos2f(-0.95, 0.90); //posision donde aparecera el texto
+	drawString (score);
+	glRasterPos2f(-0.95, 0.85); //posision donde aparecera el texto
+	drawString (vidas);
 }
 
 void display(void){
 	//char nombre="space Invaders 2";
-
     espacio();
     nave();
     //enemigo();
-    bala();
+    //bala();
     texto();
     dibujar_enemigos(w1);
+	dibujar_balas(w1);
+	//habilitar_balas(w1);
     glFlush();
 
 }//display
 
-void movbala(int v)
-{
+/*
+void movbala(int v){
     glutTimerFunc(500,movbala,2);
     moverbala();
     bala();
     glutPostRedisplay();
-}
+}*/
 
-void idle(int v)
-{
+void idle(int v){
     glutTimerFunc(600,idle,1);
+	w1 = mover_balas(w1);
 	w1 = Mover_Naves_Enemigas(w1);
 	dibujar_enemigos(w1);
+	dibujar_balas(w1);
+
 	//moverenemigo();
     //enemigo();
     glutPostRedisplay();
-}
+}//idle
+
+void keyboard(unsigned char key, int x, int y){
+    switch (key) {
+        case 27:
+            exit(0);
+            break;
+		case 32:
+			w1 = habilitar_balas(w1);
+			break;
+    }//switch
+}//keyboard
 
 int main(int argc, char **argv){
   glutInit(&argc, argv); //es la que echa andar openGL
