@@ -11,7 +11,7 @@
 [*] - mover la nave de izquierda a derecha
 [*] - mover automaticamente los enemigos
 [ ] - modificar las variables vida y puntuacion
-[ ] - refactorizar el random que hace descender a los enemigos
+[*] - refactorizar el random que hace descender a los enemigos
 */
 static char label[100];
 static char score[100];
@@ -24,6 +24,7 @@ World w1;
 int puntuacion = 0;
 int vida = 3;
 int disparo_actual = 0;
+int cantidadBalas = 40;
 
 World init(World world){
 
@@ -94,8 +95,6 @@ World init(World world){
 		nave8.altura = 30;
 		nave8.vidas = 1;
 		nave8.existe = true;
-	//las naves enemigas las cargamos a un vector de naves enemigas que se encuentra en
-	//entidades.cpp
 
 	world.naves_enemigas[0] = nave1;
 	world.naves_enemigas[1] = nave2;
@@ -105,18 +104,12 @@ World init(World world){
 	world.naves_enemigas[5] = nave6;
 	world.naves_enemigas[6] = nave7;
 	world.naves_enemigas[7] = nave8;
-    //printf("llego hasta aqui\n");
-	//printf("nave enemiga 0 es: %f\n", world.naves_enemigas[0].x);
-	//printf("nave enemiga 1 es: %f\n", nave1.x);
-		//usamos las estructuras del archivo entidades.h para
-		//usarlas como si fueran objetos, instanciar n numero de objetos
-		//y modificar sus propiedades de forma independiente
-	Disparo d1;
+    Disparo d1;
 	d1.x = 0;
 	d1.y = 0;
 	d1.existe = false;
 
-	for(int i = 0; i < 40; i++){
+	for(int i = 0; i < cantidadBalas; i++){
 		world.disparos[i] = d1;
 	}//for
 	return world;
@@ -128,21 +121,16 @@ void inline drawString (char *s){
 	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]); //TIPO YA TAMAÑO DE LETRA
 }
 
-
-
 void arrowkey(int key, int x, int y){
     switch (key) {
         case GLUT_KEY_RIGHT:
             //system("canberra-gtk-play -f audio.ogg"); canberra-gtk-play --id blaster.wav
             if(tx < 0.70)
                 tx += 0.05;
-            //printf("valor tx: %f\n", tx);
         break;
-
         case GLUT_KEY_LEFT:
         if(tx > -0.70)
             tx -= 0.05;
-            //printf("valor tx: %f\n", tx);
         break;
     }//switch
 	glutPostRedisplay();
@@ -153,9 +141,8 @@ void espacio(){
     glColor3f(0.0, 0.0, 0.0);
 }//espacio
 
-void nave(){
+void nave_principal(){
     glColor3f(1.0, 1.0, 1.0);
-    //glTranslatef(tx, ty, 0);
 
     glBegin(GL_POLYGON);
         glVertex2f(-0.15 +tx, -0.8);
@@ -169,7 +156,7 @@ void nave(){
         glVertex2f(0.05+tx, -0.75);
         glVertex2f(0.05+tx, -0.8);
     glEnd();
-}//nave
+}//nave_principal
 
 void enemigo(){
     glColor3f(0.0, 1.0, 0.0);
@@ -185,28 +172,26 @@ void dibujar_enemigos(World world){
     float x, y;
     glColor3f(0.0, 1.0, 0.0);
     for(int i = 0; i < cantidadEnemigos; i++){
-        x = world.naves_enemigas[i].x;
-        y = world.naves_enemigas[i].y;
-    	//printf("x: %f y: %f\n", x, y);
-    glBegin(GL_POLYGON);
-        glVertex2f(x, y);
-    	//printf("x: %f y: %f\n", x, y);
-        glVertex2f(x, y+0.1);
-    	//printf("x: %f y: %f\n", x, y+0.1);
-        glVertex2f(x+0.1, y+0.1);
-        glVertex2f(x+0.1, y);
-    glEnd();
+		if(world.naves_enemigas[i].existe == true){
+			x = world.naves_enemigas[i].x;
+        	y = world.naves_enemigas[i].y;
+    	glBegin(GL_POLYGON);
+        	glVertex2f(x, y);
+        	glVertex2f(x, y+0.1);
+        	glVertex2f(x+0.1, y+0.1);
+        	glVertex2f(x+0.1, y);
+    	glEnd();
+		}
     }//for
 }//dibujar_enemigos
 
-World Mover_Naves_Enemigas(World world) {
+World mover_naves_enemigas(World world) {
 	//MOVIMIENTO DE LAS NAVES ENEMIGAS
 	for (int i = 0; i < cantidadEnemigos; i++) {
         if(world.naves_enemigas[i].y > -1.0){
 			float var = rand() % 10;
 			var = var / 100;
             world.naves_enemigas[i].y -= var;
-			//printf("random: %f\n", var);
 		}else{
             world.naves_enemigas[i].y = 0.7;
         }
@@ -224,39 +209,20 @@ World Mover_Naves_Enemigas(World world) {
 				world.izda = false;
 			}
 		}
-		//printf("naves 0.x %f\n", world.naves_enemigas[0].x);
 	}
 	return world;
-}//Mover_Naves_Enemigas
-
-void moverbala(){
-    if(pb < 2.0){
-        pb+=0.05;
-    }
-    else{
-      pb=0.0;
-    }
-    //pb = 0.0;
-    //printf("pb: %f\n", pb);
-    //glFlush();
-}//moverenemigo
+}//mover_naves_enemigas
 
 void dibujar_balas(World world){
-	//puts("dibujar_balas");
     float x, y;
-    //glColor3f(0.0, 1.0, 0.0);
-    for(int i = 0; i < 40; i++){
+    for(int i = 0; i < cantidadBalas; i++){
 		if(world.disparos[i].existe == true){
         	x = world.disparos[i].x;
         	y = world.disparos[i].y;
-    		printf("dibujando i: %d\n", i);
-
     		glColor3f(0.0, 0.0, 1.0);
 			glBegin(GL_POLYGON);
         		glVertex2f(x, y);
-    			//printf("x: %f y: %f\n", x, y);
         		glVertex2f(x, y+0.07);
-    			//printf("x: %f y: %f\n", x, y+0.1);
         		glVertex2f(x+0.06, y+0.07);
         		glVertex2f(x+0.06, y);
     		glEnd();
@@ -264,35 +230,24 @@ void dibujar_balas(World world){
     }//for
 }//dibujar_enemigos
 
-void bala(){
-    glBegin(GL_POLYGON);
-        glVertex2f(-0.03, -0.7+pb);
-        glVertex2f(-0.03, -0.77+pb);
-        glVertex2f(0.03, -0.77+pb);
-        glVertex2f(0.03, -0.7+pb);
-    glEnd();
-}//bala
-
 World mover_balas(World world) {
-	for (int i = 0; i < 40; i++) {
+	for (int i = 0; i < cantidadBalas; i++) {
 		if(world.disparos[i].existe == true){
         	if(world.disparos[i].y > -1.0){
-            	world.disparos[i].y += 0.03;
-				//printf("random: %f\n", );
+            	world.disparos[i].y += 0.1;
 			}else{
             	world.disparos[i].existe = false;
         	}
 		}//if
 	}//for
 	return world;
-}//Mover_Naves_Enemigas
+}//mover_naves_enemigas
 
 World habilitar_balas(World world){
-	//puts("habilitar_balas");
-	if(disparo_actual == 40)
+	if(disparo_actual == cantidadBalas)
 		disparo_actual = 0; //resetear, por indice 0
 	if(world.disparos[disparo_actual].existe == false){
-		world.disparos[disparo_actual].x = 0.05+tx;
+		world.disparos[disparo_actual].x = tx;
 		world.disparos[disparo_actual].y = -0.75;
 		world.disparos[disparo_actual].existe = true;
 		disparo_actual++;
@@ -300,6 +255,19 @@ World habilitar_balas(World world){
 	}
 	return world;
 }//habilitar_balas
+
+void colision_disparoConEnemigo(World world){
+	for(int m = 0; m < cantidadBalas; m++) {
+		for (int n = 0; n < cantidadEnemigos; n++) {
+			if(world.naves_enemigas[n].existe == true) {
+				if(Colision((Obtener_Rectangulo(world.disparos[m])), Obtener_Rectangulo(world.naves1[n]))) {
+					world.disparos[m].existe = false;
+					world.naves1[n].existe = false;
+				};
+			}//if
+		}//for
+	}//for
+}//colision_disparoConEnemigo
 
 void texto(){
 	glColor3f(0.0, 1.0, 0.0);
@@ -312,39 +280,23 @@ void texto(){
 	drawString (score);
 	glRasterPos2f(-0.95, 0.85); //posision donde aparecera el texto
 	drawString (vidas);
-}
+}//texto
 
 void display(void){
-	//char nombre="space Invaders 2";
     espacio();
-    nave();
-    //enemigo();
-    //bala();
+    nave_principal();
     texto();
     dibujar_enemigos(w1);
 	dibujar_balas(w1);
-	//habilitar_balas(w1);
     glFlush();
-
 }//display
-
-/*
-void movbala(int v){
-    glutTimerFunc(500,movbala,2);
-    moverbala();
-    bala();
-    glutPostRedisplay();
-}*/
 
 void idle(int v){
     glutTimerFunc(600,idle,1);
 	w1 = mover_balas(w1);
-	w1 = Mover_Naves_Enemigas(w1);
+	w1 = mover_naves_enemigas(w1);
 	dibujar_enemigos(w1);
 	dibujar_balas(w1);
-
-	//moverenemigo();
-    //enemigo();
     glutPostRedisplay();
 }//idle
 
