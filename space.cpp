@@ -12,6 +12,9 @@
 [*] - mover automaticamente los enemigos
 [ ] - modificar las variables vida y puntuacion
 [*] - refactorizar el random que hace descender a los enemigos
+[ ] - reporte
+[ ] - aplicacion terminada
+[ ] - colision con nave protagonista
 */
 static char label[100];
 static char score[100];
@@ -256,17 +259,37 @@ World habilitar_balas(World world){
 	return world;
 }//habilitar_balas
 
-void colision_disparoConEnemigo(World world){
+bool colision(float x1, float x2, float x3, float x4){
+	int c1 = 0;
+	int c2 = 0;
+	if(x3 > x1 && x3 < x2){
+		c1 = 1;
+	}
+	if(x4 > x1 && x4 < x2){
+		c2 = 1;
+	}
+	if(c1 == 1 || c2 == 1)
+		return true;
+	return false;
+	//return c1 && c2;
+}//colision
+
+World colision_disparoConEnemigo(World world){
 	for(int m = 0; m < cantidadBalas; m++) {
 		for (int n = 0; n < cantidadEnemigos; n++) {
 			if(world.naves_enemigas[n].existe == true) {
-				if(Colision((Obtener_Rectangulo(world.disparos[m])), Obtener_Rectangulo(world.naves1[n]))) {
-					world.disparos[m].existe = false;
-					world.naves1[n].existe = false;
-				};
+				if(colision(world.naves_enemigas[n].x, world.naves_enemigas[n].x + 0.1, world.disparos[m].x, world.disparos[m].x + 0.06) ){
+					if(colision(world.naves_enemigas[n].y, world.naves_enemigas[n].y + 0.1, world.disparos[m].y, world.disparos[m].y + 0.07) ){
+						puts("entering colision");
+						world.disparos[m].existe = false;
+						world.naves_enemigas[n].existe = false;
+						puts("colision_disparoConEnemigo");
+					}
+				}
 			}//if
 		}//for
 	}//for
+	return world;
 }//colision_disparoConEnemigo
 
 void texto(){
@@ -297,6 +320,7 @@ void idle(int v){
 	w1 = mover_naves_enemigas(w1);
 	dibujar_enemigos(w1);
 	dibujar_balas(w1);
+	w1 = colision_disparoConEnemigo(w1);
     glutPostRedisplay();
 }//idle
 
