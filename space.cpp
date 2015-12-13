@@ -28,6 +28,10 @@ int puntuacion = 0;
 int vida = 3;
 int disparo_actual = 0;
 int cantidadBalas = 40;
+//vars para posicion actual de nave principal
+float ax, ay, bx, by, cx, cy, dx, dy;
+//vars para pos actual de enemigo
+float px, py;
 
 World init(World world){
 
@@ -119,25 +123,11 @@ World init(World world){
 }//init
 
 void inline drawString (char *s){
- unsigned int i;
- for (i=0; i<strlen(s); i++)
-	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]); //TIPO YA TAMAÑO DE LETRA
-}
+	unsigned int i;
+	for (i=0; i<strlen(s); i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]); //TIPO YA TAMAÑO DE LETRA
+}//inline
 
-void arrowkey(int key, int x, int y){
-    switch (key) {
-        case GLUT_KEY_RIGHT:
-            //system("canberra-gtk-play -f audio.ogg"); canberra-gtk-play --id blaster.wav
-            if(tx < 0.70)
-                tx += 0.05;
-        break;
-        case GLUT_KEY_LEFT:
-        if(tx > -0.70)
-            tx -= 0.05;
-        break;
-    }//switch
-	glutPostRedisplay();
-}//ArrowKey
 
 void espacio(){
     glClear(GL_COLOR_BUFFER_BIT);
@@ -146,21 +136,31 @@ void espacio(){
 
 void nave_principal(){
     glColor3f(1.0, 1.0, 1.0);
-
+	//base
     glBegin(GL_POLYGON);
-        glVertex2f(-0.15 +tx, -0.8);
+        glVertex2f(-0.15 +tx, -0.8); //A
         glVertex2f(-0.15+tx, -0.85);
         glVertex2f(0.15+tx, -0.85);
-        glVertex2f(0.15+tx, -0.8);
+        glVertex2f(0.15+tx, -0.8); //B
     glEnd();
+	//canion
     glBegin(GL_POLYGON);
         glVertex2f(-0.05 +tx, -0.8);
-        glVertex2f(-0.05+tx, -0.75);
-        glVertex2f(0.05+tx, -0.75);
+        glVertex2f(-0.05+tx, -0.75); //C
+        glVertex2f(0.05+tx, -0.75); //D
         glVertex2f(0.05+tx, -0.8);
     glEnd();
+	ax = -0.15 + tx;
+	ay = -0.8;
+	bx = 0.15 + tx;
+	by = 0.15 + tx;
+	cx = -0.05 + tx;
+	cy = -0.75;
+	dx = 0.05 + tx;
+	dy = -0.75;
 }//nave_principal
 
+/*
 void enemigo(){
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_POLYGON);
@@ -170,6 +170,7 @@ void enemigo(){
         glVertex2f(0.1, 0.9-ty);
     glEnd();
 }//enemigo
+*/
 
 void dibujar_enemigos(World world){
     float x, y;
@@ -254,10 +255,28 @@ World habilitar_balas(World world){
 		world.disparos[disparo_actual].y = -0.75;
 		world.disparos[disparo_actual].existe = true;
 		disparo_actual++;
-		printf("habilitar_balas x: %f\n", world.disparos[disparo_actual-1].x);
+		//printf("habilitar_balas x: %f\n", world.disparos[disparo_actual-1].x);
 	}
 	return world;
 }//habilitar_balas
+
+
+bool between(float px, float py){
+	//px entre cx y dx && py <= cy
+	if(px >= cx && px <= dx && py <= cy)
+		return true;
+	return false;
+}//between
+
+void colision_enemigo_con_jugador(World world){
+	for(int i = 0; i < cantidadEnemigos; i++){
+			px = world.naves_enemigas[i].x;
+			py = world.naves_enemigas[i].y;
+			//printf("Enemigo %d px %f py %f\n", i, px, py);
+			if( between(px, py) )
+				printf("enemigo %d rebasó el canion\n", i);
+	}//for
+}//colision_enemigo_con_jugador
 
 bool colision(float x1, float x2, float x3, float x4){
 	int c1 = 0;
@@ -274,23 +293,23 @@ bool colision(float x1, float x2, float x3, float x4){
 	//return c1 && c2;
 }//colision
 
-World colision_disparoConEnemigo(World world){
+World colision_disparo_con_enemigo(World world){
 	for(int m = 0; m < cantidadBalas; m++) {
 		for (int n = 0; n < cantidadEnemigos; n++) {
 			if(world.naves_enemigas[n].existe == true) {
 				if(colision(world.naves_enemigas[n].x, world.naves_enemigas[n].x + 0.1, world.disparos[m].x, world.disparos[m].x + 0.06) ){
 					if(colision(world.naves_enemigas[n].y, world.naves_enemigas[n].y + 0.1, world.disparos[m].y, world.disparos[m].y + 0.07) ){
-						puts("entering colision");
+						//puts("entering colision");
 						world.disparos[m].existe = false;
 						world.naves_enemigas[n].existe = false;
-						puts("colision_disparoConEnemigo");
+						//puts("colision_disparo_con_enemigo");
 					}
 				}
 			}//if
 		}//for
 	}//for
 	return world;
-}//colision_disparoConEnemigo
+}//colision_disparo_con_enemigo
 
 void texto(){
 	glColor3f(0.0, 1.0, 0.0);
@@ -307,8 +326,10 @@ void texto(){
 
 void display(void){
     espacio();
+	//printf("A %f %f B %f %f C %f %f D %f %f\n", ax, Ay, bx, by, cx, cy, dx, dy);
     nave_principal();
     texto();
+	colision_enemigo_con_jugador(w1);
     dibujar_enemigos(w1);
 	dibujar_balas(w1);
     glFlush();
@@ -320,7 +341,7 @@ void idle(int v){
 	w1 = mover_naves_enemigas(w1);
 	dibujar_enemigos(w1);
 	dibujar_balas(w1);
-	w1 = colision_disparoConEnemigo(w1);
+	w1 = colision_disparo_con_enemigo(w1);
     glutPostRedisplay();
 }//idle
 
@@ -334,6 +355,21 @@ void keyboard(unsigned char key, int x, int y){
 			break;
     }//switch
 }//keyboard
+
+void arrowkey(int key, int x, int y){
+    switch (key) {
+        case GLUT_KEY_RIGHT:
+            //system("canberra-gtk-play -f audio.ogg"); canberra-gtk-play --id blaster.wav
+            if(tx < 0.70)
+                tx += 0.05;
+        break;
+        case GLUT_KEY_LEFT:
+        if(tx > -0.70)
+            tx -= 0.05;
+        break;
+    }//switch
+	glutPostRedisplay();
+}//ArrowKey
 
 int main(int argc, char **argv){
   glutInit(&argc, argv); //es la que echa andar openGL
