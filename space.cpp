@@ -17,21 +17,25 @@
 [ ] - colision con nave protagonista
 */
 static char label[100];
-static char score[100];
-static char vidas[100];
+static char label2[100];
+static char label3[100];
+//static char continuar[100];
+//static char juegoTerminado[100];
 float tx = 0.0;
 float ty = 0.0;
 float pb = 0.0;
 int cantidadEnemigos = 8;
 World w1;
 int puntuacion = 0;
-int vida = 3;
+int vidas = 0;
 int disparo_actual = 0;
 int cantidadBalas = 40;
 //vars para posicion actual de nave principal
 float ax, ay, bx, by, cx, cy, dx, dy;
 //vars para pos actual de enemigo
 float px, py;
+//flujo del juego
+bool vidaPerdida = false;
 
 World init(World world){
 
@@ -160,18 +164,6 @@ void nave_principal(){
 	dy = -0.75;
 }//nave_principal
 
-/*
-void enemigo(){
-    glColor3f(0.0, 1.0, 0.0);
-    glBegin(GL_POLYGON);
-        glVertex2f(0.0, 0.9-ty);
-        glVertex2f(0.0, 1.0-ty);
-        glVertex2f(0.1, 1.0-ty);
-        glVertex2f(0.1, 0.9-ty);
-    glEnd();
-}//enemigo
-*/
-
 void dibujar_enemigos(World world){
     float x, y;
     glColor3f(0.0, 1.0, 0.0);
@@ -268,14 +260,18 @@ bool between(float px, float py){
 	return false;
 }//between
 
-void colision_enemigo_con_jugador(World world){
+bool colision_enemigo_con_jugador(World world){
 	for(int i = 0; i < cantidadEnemigos; i++){
 			px = world.naves_enemigas[i].x;
 			py = world.naves_enemigas[i].y;
 			//printf("Enemigo %d px %f py %f\n", i, px, py);
-			if( between(px, py) )
-				printf("enemigo %d rebasó el canion\n", i);
+			if( between(px, py) ){
+				printf("enemigo %d tocó la nave\n", i);
+				//vidaPerdida = true;
+				return true;
+			}
 	}//for
+	return false;
 }//colision_enemigo_con_jugador
 
 bool colision(float x1, float x2, float x3, float x4){
@@ -303,6 +299,7 @@ World colision_disparo_con_enemigo(World world){
 						world.disparos[m].existe = false;
 						world.naves_enemigas[n].existe = false;
 						//puts("colision_disparo_con_enemigo");
+						puntuacion += 10;
 					}
 				}
 			}//if
@@ -314,25 +311,79 @@ World colision_disparo_con_enemigo(World world){
 void texto(){
 	glColor3f(0.0, 1.0, 0.0);
 	sprintf(label,"%s", "space Invaders 2");
-	sprintf(score,"%s %d", "Score:", puntuacion);
-	sprintf(vidas, "%s %d", "Vidas:", vida);
+	sprintf(label2,"%s %d", "Score:", puntuacion);
+	sprintf(label3, "%s %d", "Vidas:", vidas);
 	glRasterPos2f(-0.95, 0.95); //posision donde aparecera el texto
 	drawString (label);
 	glRasterPos2f(-0.95, 0.90); //posision donde aparecera el texto
-	drawString (score);
+	drawString (label2);
 	glRasterPos2f(-0.95, 0.85); //posision donde aparecera el texto
-	drawString (vidas);
+	drawString (label3);
 }//texto
+
+void gameOver(){
+	glColor3f(1.0, 0.0, 0.0);
+	if(vidas == 0){
+		vidaPerdida = true;
+		sprintf(label, "%s", "GAME OVER");
+		sprintf(label2, "%s", "RESET? ENTER");
+		sprintf(label3, "%s %d", "Vidas: ", vidas);
+		glRasterPos2f(0.0, 0.0);
+		drawString(label);
+		glRasterPos2f(0.0, -0.1);
+		drawString(label3);
+		glRasterPos2f(0.0, -0.2);
+		drawString(label2);
+		vidas = 3;
+		w1 = init(w1);
+		puntuacion = 0;
+	}else{
+		vidaPerdida = true;
+		sprintf(label, "%s", "¿continuar? ENTER");
+		sprintf(label2, "%s %d", "Vidas restantes: ", vidas);
+		glRasterPos2f(0.0, 0.0);
+		drawString(label);
+		glRasterPos2f(0.0, -0.1);
+		drawString(label2);
+		vidas--;
+		w1 = init(w1);
+	}
+}//gameOver
+
+void game_win(){
+	glColor3f(1.0, 0.0, 0.0);
+	vidaPerdida = true; //detener el flujo
+	sprintf(label, "%s", "GANAS POR PUNTUACION");
+	sprintf(label2, "%s", "RESET? ENTER");
+	glRasterPos2f(0.0, 0.0);
+	drawString(label);
+	glRasterPos2f(0.0, -0.1);
+	drawString(label2);
+	vidas = 3;
+	w1 = init(w1);
+	puntuacion = 0;
+}//game_win
 
 void display(void){
     espacio();
-	//printf("A %f %f B %f %f C %f %f D %f %f\n", ax, Ay, bx, by, cx, cy, dx, dy);
     nave_principal();
     texto();
-	colision_enemigo_con_jugador(w1);
+	//colision_enemigo_con_jugador(w1);
     dibujar_enemigos(w1);
 	dibujar_balas(w1);
-    glFlush();
+	//intentando colocar aqui la revision de colision con jugador
+	if( colision_enemigo_con_jugador(w1) ){
+		//vidaPerdida = true;
+		gameOver();
+		glFlush();
+	}
+	if(!vidaPerdida){
+		glFlush();
+	}
+	if(puntuacion >= 60){
+		game_win();
+		glFlush();
+	}
 }//display
 
 void idle(int v){
@@ -342,7 +393,8 @@ void idle(int v){
 	dibujar_enemigos(w1);
 	dibujar_balas(w1);
 	w1 = colision_disparo_con_enemigo(w1);
-    glutPostRedisplay();
+	if(!vidaPerdida)
+    	glutPostRedisplay();
 }//idle
 
 void keyboard(unsigned char key, int x, int y){
@@ -350,8 +402,11 @@ void keyboard(unsigned char key, int x, int y){
         case 27:
             exit(0);
             break;
-		case 32:
+		case 32: //space bar
 			w1 = habilitar_balas(w1);
+			break;
+		case 13:
+			vidaPerdida = false;
 			break;
     }//switch
 }//keyboard
@@ -372,23 +427,24 @@ void arrowkey(int key, int x, int y){
 }//ArrowKey
 
 int main(int argc, char **argv){
-  glutInit(&argc, argv); //es la que echa andar openGL
-  //Buffer simple
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB ); //inicia el modo de visualizacion del programa
-  //glutInitWindowPosition(100, 120); //en donde aparecera la esquina sup izquierda
-  glutInitWindowSize(440, 640); //tamaño de la ventana en ancho y alto, pixeles
-  glutCreateWindow("Space Invaders GL"); //lanza la ventana
-  //Llamada a la función de dibujado
-  glutDisplayFunc(display); //OpenGL se refresca solito
-  glutTimerFunc(500,idle,0); // idle es una funcion que se ejecuta cuando no hay otra cosa que hacer
-  //Timer ejecuta a idle cada cierto tiempo en este caso 500 milisegundos
-  //el 0 como parametro es un id de este proceso retardado
-  //declarar una variable de tipo World y pasarsela a init como parámetro
-  w1 = init(w1);
-  //glutReshapeFunc(reshape);
-  glutKeyboardFunc(keyboard);
-  glutSpecialFunc(arrowkey);
+	glutInit(&argc, argv); //es la que echa andar openGL
+ 	//Buffer simple
+ 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB ); //inicia el modo de visualizacion del programa
+ 	//glutInitWindowPosition(100, 120); //en donde aparecera la esquina sup izquierda
+ 	glutInitWindowSize(440, 640); //tamaño de la ventana en ancho y alto, pixeles
+ 	glutCreateWindow("Space Invaders GL"); //lanza la ventana
+ 	//Llamada a la función de dibujado
+ 	glutDisplayFunc(display); //OpenGL se refresca solito
+ 	glutTimerFunc(500,idle,0); // idle es una funcion que se ejecuta cuando no hay otra cosa que hacer
 
-  glutMainLoop();
-  return 0;
+ 	//Timer ejecuta a idle cada cierto tiempo en este caso 500 milisegundos
+ 	//el 0 como parametro es un id de este proceso retardado
+ 	//declarar una variable de tipo World y pasarsela a init como parámetro
+ 	w1 = init(w1);
+ 	//glutReshapeFunc(reshape);
+ 	glutKeyboardFunc(keyboard);
+ 	glutSpecialFunc(arrowkey);
+
+ 	glutMainLoop();
+ 	return 0;
 }//main
