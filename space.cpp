@@ -185,7 +185,7 @@ World mover_naves_enemigas(World world) {
 	//MOVIMIENTO DE LAS NAVES ENEMIGAS
 	for (int i = 0; i < cantidadEnemigos; i++) {
         if(world.naves_enemigas[i].y > -1.0){
-			float var = rand() % 10;
+			float var = rand() % 3;
 			var = var / 100;
             world.naves_enemigas[i].y -= var;
 		}else{
@@ -230,7 +230,7 @@ World mover_balas(World world) {
 	for (int i = 0; i < cantidadBalas; i++) {
 		if(world.disparos[i].existe == true){
         	if(world.disparos[i].y > -1.0){
-            	world.disparos[i].y += 0.1;
+            	world.disparos[i].y += 0.07;
 			}else{
             	world.disparos[i].existe = false;
         	}
@@ -387,7 +387,7 @@ void display(void){
 }//display
 
 void idle(int v){
-    glutTimerFunc(600,idle,1);
+    glutTimerFunc(100,idle,1);
 	w1 = mover_balas(w1);
 	w1 = mover_naves_enemigas(w1);
 	dibujar_enemigos(w1);
